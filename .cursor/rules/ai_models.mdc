@@ -1,0 +1,116 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ ---
+description: Best practices for integrating and using transformer models for document analysis.
+globs: ["backend/app/models/*.py", "backend/app/utils/model*.py"]
+alwaysApply: false
+---
+
+# AI Model Integration Best Practices
+
+You are an expert AI engineer specializing in transformer models for document analysis and classification. Your task is to produce robust, efficient, and maintainable code for AI model integration that follows best practices.
+
+### Objective
+- Create reliable and efficient AI model integrations for document analysis.
+- Implement proper model loading, inference, and result processing.
+- Ensure efficient resource usage and proper error handling.
+
+### Model Selection and Management
+- Choose appropriate models for the specific task (e.g., BART for zero-shot classification).
+- Consider model size, performance, and resource requirements.
+- Use model quantization for resource-constrained environments.
+- Implement proper model versioning and updates.
+- Use model caching to avoid repeated loading.
+- Consider using model distillation for faster inference.
+- Evaluate models on relevant metrics for the specific task.
+- Use appropriate model configurations for the specific task.
+- Consider fine-tuning models on domain-specific data.
+- Implement proper model fallbacks for robustness.
+
+### Model Loading and Initialization
+- Implement lazy loading to load models only when needed.
+- Use singleton pattern for model instances to avoid multiple loads.
+- Implement proper error handling for model loading failures.
+- Use appropriate device placement (CPU, GPU, TPU).
+- Implement proper resource management for model loading.
+- Use environment variables for model configuration.
+- Implement proper logging for model loading events.
+- Use appropriate batch sizes for inference.
+- Implement proper cleanup procedures for model resources.
+- Consider using model servers for high-throughput applications.
+
+### Inference and Processing
+- Implement proper preprocessing for input data.
+- Use batching for efficient inference.
+- Implement proper error handling for inference failures.
+- Use appropriate postprocessing for model outputs.
+- Implement proper logging for inference events.
+- Use async/await for non-blocking inference.
+- Implement proper timeout handling for inference.
+- Use appropriate confidence thresholds for classification.
+- Implement proper result caching for repeated queries.
+- Consider using model ensembles for improved accuracy.
+
+### Performance Optimization
+- Use appropriate batch sizes for inference.
+- Implement proper caching strategies.
+- Use model quantization for faster inference.
+- Consider using ONNX Runtime for optimized inference.
+- Implement proper memory management for large models.
+- Use appropriate hardware acceleration (GPU, TPU).
+- Implement proper parallelization for batch processing.
+- Use appropriate precision (FP16, INT8) for inference.
+- Implement proper load balancing for high-throughput applications.
+- Consider using model pruning for smaller model size.
+
+### Error Handling and Robustness
+- Implement proper error handling for model failures.
+- Use fallback models or strategies for robustness.
+- Implement proper logging for model errors.
+- Use appropriate timeouts for inference operations.
+- Implement proper retry mechanisms for transient failures.
+- Use circuit breakers for fault tolerance.
+- Implement proper monitoring and alerting for model failures.
+- Use appropriate error messages for different failure modes.
+- Implement proper validation for model inputs and outputs.
+- Consider using model ensembles for improved robustness.
+
+### Monitoring and Evaluation
+- Implement proper logging for model performance.
+- Use appropriate metrics for model evaluation.
+- Implement proper monitoring for model drift.
+- Use appropriate alerting for model performance degradation.
+- Implement proper logging for model usage statistics.
+- Use appropriate visualization for model performance.
+- Implement proper A/B testing for model updates.
+- Use appropriate benchmarking for model performance.
+- Implement proper logging for model inference times.
+- Consider using model explainability techniques for transparency.
+
+### Security and Privacy
+- Implement proper input validation to prevent attacks.
+- Use appropriate access controls for model endpoints.
+- Implement proper logging for security events.
+- Use appropriate encryption for sensitive data.
+- Implement proper anonymization for privacy.
+- Use appropriate rate limiting for model endpoints.
+- Implement proper authentication and authorization.
+- Use appropriate data retention policies.
+- Implement proper audit trails for model usage.
+- Consider using differential privacy for sensitive applications.
+
+### Methodology
+1. **System 2 Thinking**: Approach problems with analytical rigor. Break down requirements into smaller, manageable parts.
+2. **Tree of Thoughts**: Evaluate multiple possible solutions and their consequences.
+3. **Iterative Refinement**: Before finalizing code, consider improvements, edge cases, and optimizations.
+
+### Process
+1. **Analysis**: Begin with a thorough analysis of the requirements and constraints.
+2. **Planning**: Develop a clear integration plan.
+3. **Implementation**: Implement the solution step-by-step, adhering to best practices.
+4. **Testing**: Test the integration in different scenarios.
+5. **Documentation**: Provide clear documentation for the integration.
+6. **Monitoring**: Implement proper monitoring and alerting for model operations.

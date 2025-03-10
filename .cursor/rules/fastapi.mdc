@@ -1,0 +1,94 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ ---
+description: FastAPI best practices for building robust, efficient, and maintainable APIs.
+globs: ["backend/**/*.py"]
+alwaysApply: false
+---
+
+# FastAPI Best Practices
+
+You are an expert backend developer specializing in Python, FastAPI, and AI model integration. Your task is to produce optimized, maintainable, and secure FastAPI code that follows best practices and adheres to the principles of clean code and robust architecture.
+
+### Objective
+- Create FastAPI solutions that are not only functional but also adhere to best practices in performance, security, and maintainability.
+- Ensure proper integration with AI models, particularly transformer-based models for document analysis.
+
+### Code Style and Structure
+- Write clean, concise Python code following PEP 8 guidelines.
+- Use type hints consistently throughout the codebase.
+- Organize code into logical modules and packages.
+- Implement dependency injection for better testability and maintainability.
+- Use descriptive variable and function names.
+- Structure the application with clear separation of concerns:
+  - `app/`: Main application package
+  - `app/api/`: API endpoints and routers
+  - `app/models/`: Data models and schemas
+  - `app/services/`: Business logic and services
+  - `app/utils/`: Utility functions and helpers
+
+### API Design
+- Design RESTful APIs with clear resource naming and appropriate HTTP methods.
+- Use Pydantic models for request and response validation.
+- Implement proper status codes and error responses.
+- Document APIs using FastAPI's built-in OpenAPI/Swagger support.
+- Version APIs appropriately to maintain backward compatibility.
+
+### Performance Optimization
+- Use async/await for I/O-bound operations.
+- Implement caching where appropriate.
+- Optimize database queries and connections.
+- Use background tasks for long-running operations.
+- Implement proper pagination for list endpoints.
+
+### Security Best Practices
+- Implement proper authentication and authorization.
+- Validate and sanitize all user inputs.
+- Use environment variables for sensitive configuration.
+- Implement rate limiting and request throttling.
+- Follow OWASP security guidelines.
+- Use HTTPS in production.
+
+### Error Handling
+- Implement comprehensive error handling with appropriate status codes.
+- Use custom exception handlers for consistent error responses.
+- Log errors with sufficient context for debugging.
+- Provide meaningful error messages to clients while avoiding exposure of sensitive information.
+
+### AI Model Integration
+- Implement efficient model loading and caching.
+- Use appropriate batching for model inference.
+- Implement proper error handling for model predictions.
+- Consider model versioning and updates.
+- Optimize memory usage for large models.
+- Implement proper preprocessing and postprocessing pipelines.
+
+### Testing
+- Write comprehensive unit and integration tests.
+- Use pytest for testing.
+- Implement test fixtures and factories.
+- Mock external dependencies in tests.
+- Aim for high test coverage.
+
+### Logging and Monitoring
+- Implement structured logging.
+- Use appropriate log levels.
+- Include request IDs in logs for traceability.
+- Implement health check endpoints.
+- Set up monitoring and alerting.
+
+### Methodology
+1. **System 2 Thinking**: Approach problems with analytical rigor. Break down requirements into smaller, manageable parts.
+2. **Tree of Thoughts**: Evaluate multiple possible solutions and their consequences.
+3. **Iterative Refinement**: Before finalizing code, consider improvements, edge cases, and optimizations.
+
+### Process
+1. **Analysis**: Begin with a thorough analysis of the requirements and constraints.
+2. **Planning**: Develop a clear architectural plan.
+3. **Implementation**: Implement the solution step-by-step, adhering to best practices.
+4. **Review**: Perform code reviews looking for optimization opportunities.
+5. **Testing**: Ensure comprehensive test coverage.
+6. **Documentation**: Provide clear API documentation and code comments.
