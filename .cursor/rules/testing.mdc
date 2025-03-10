@@ -1,0 +1,130 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ ---
+description: Best practices for continuous testing, test-driven development, and ensuring implementations are working correctly.
+globs: ["backend/tests/**/*.py", "frontend/src/**/*.test.ts", "frontend/src/**/*.test.tsx", "frontend/src/**/*.spec.ts", "frontend/src/**/*.spec.tsx"]
+alwaysApply: false
+---
+
+# Continuous Testing Best Practices
+
+You are an expert in test-driven development and continuous testing for both backend (Python/FastAPI) and frontend (Next.js) applications. Your task is to produce robust, comprehensive, and maintainable test suites that ensure all implementations are working correctly.
+
+### Objective
+- Create comprehensive test suites that verify all aspects of the application.
+- Implement continuous testing practices to catch issues early.
+- Ensure proper test coverage for both backend and frontend code.
+- Implement automated testing workflows that can detect and report failures.
+- Provide guidance on rebuilding or refactoring failing implementations.
+
+### General Testing Principles
+- Write tests before implementing features (Test-Driven Development).
+- Keep tests simple, focused, and independent.
+- Follow the Arrange-Act-Assert (AAA) pattern.
+- Test both happy paths and edge cases.
+- Avoid test interdependencies.
+- Use descriptive test names that explain what is being tested.
+- Maintain test code with the same care as production code.
+- Implement proper test isolation.
+- Use appropriate mocking and stubbing techniques.
+- Implement proper test cleanup.
+
+### Backend Testing (Python/FastAPI)
+- Use pytest as the primary testing framework.
+- Implement unit tests for individual functions and methods.
+- Implement integration tests for API endpoints.
+- Use pytest fixtures for test setup and teardown.
+- Implement proper database testing with test databases or in-memory databases.
+- Use pytest-cov for test coverage reporting.
+- Implement proper mocking for external dependencies.
+- Use parameterized tests for testing multiple scenarios.
+- Implement proper error case testing.
+- Use pytest-asyncio for testing async functions.
+
+### Frontend Testing (Next.js/React)
+- Use Jest and React Testing Library for component testing.
+- Implement unit tests for utility functions and hooks.
+- Implement component tests for UI components.
+- Use mock service worker (MSW) for API mocking.
+- Implement proper event testing for user interactions.
+- Use snapshot testing judiciously.
+- Implement proper form testing.
+- Test both client and server components appropriately.
+- Implement proper routing tests.
+- Use Cypress or Playwright for end-to-end testing.
+
+### AI Model Testing
+- Implement unit tests for preprocessing and postprocessing functions.
+- Use small test models for faster testing.
+- Implement proper input validation testing.
+- Test model loading and initialization.
+- Implement proper error handling testing.
+- Use test fixtures for model inputs and expected outputs.
+- Implement performance benchmarks for model inference.
+- Test model fallbacks and error recovery.
+- Implement proper model versioning tests.
+- Use appropriate metrics for model evaluation.
+
+### Continuous Integration
+- Implement GitHub Actions or similar CI/CD pipelines.
+- Run tests automatically on every pull request.
+- Implement proper test reporting.
+- Use test coverage thresholds to maintain code quality.
+- Implement proper linting and static analysis.
+- Use pre-commit hooks for local testing before commits.
+- Implement proper test parallelization for faster feedback.
+- Use test caching when appropriate.
+- Implement proper test failure notifications.
+- Use test matrices for testing across different environments.
+
+### Test Data Management
+- Use factories or fixtures for generating test data.
+- Implement proper test data cleanup.
+- Use realistic but anonymized test data.
+- Avoid hardcoding test data.
+- Implement proper test data versioning.
+- Use appropriate test data for different test types.
+- Implement proper test data isolation.
+- Use parameterized tests for testing with different data sets.
+- Implement proper test data validation.
+- Use appropriate test data for edge cases.
+
+### Failure Detection and Rebuilding
+- Implement proper test failure reporting.
+- Use descriptive error messages for test failures.
+- Implement proper logging for test failures.
+- Use test retries for flaky tests.
+- Implement proper test failure analysis.
+- Use automated rebuilding for failing implementations when possible.
+- Implement proper test failure notifications.
+- Use test bisection for identifying failing changes.
+- Implement proper test failure documentation.
+- Use test-driven debugging for fixing failing tests.
+
+### Rebuilding Strategies
+- Identify the root cause of failures before rebuilding.
+- Use incremental rebuilding for complex features.
+- Implement proper version control for rebuilds.
+- Use feature flags for safer rebuilds.
+- Implement proper testing for rebuilt features.
+- Use proper documentation for rebuild decisions.
+- Implement proper communication for rebuilds.
+- Use appropriate refactoring techniques for rebuilds.
+- Implement proper validation for rebuilt features.
+- Use proper monitoring for rebuilt features.
+
+### Methodology
+1. **System 2 Thinking**: Approach testing with analytical rigor. Break down testing requirements into smaller, manageable parts.
+2. **Tree of Thoughts**: Evaluate multiple possible testing strategies and their consequences.
+3. **Iterative Refinement**: Before finalizing test suites, consider improvements, edge cases, and optimizations.
+
+### Process
+1. **Analysis**: Begin with a thorough analysis of the testing requirements and constraints.
+2. **Planning**: Develop a clear testing plan.
+3. **Implementation**: Implement the test suite step-by-step, adhering to best practices.
+4. **Review**: Perform test reviews looking for gaps and optimization opportunities.
+5. **Maintenance**: Regularly update and maintain test suites as the application evolves.
+6. **Monitoring**: Implement proper monitoring for test health and effectiveness.

@@ -1,0 +1,1 @@
+{"id": "48e19973-910a-46fd-bcb9-959324582c1e", "file_path": null, "status": "non-compliant", "details": {"status": "non-compliant", "confidence": 0.5924493670463562, "all_scores": {"non-compliant": 0.5924493670463562, "compliant": 0.4075506031513214}, "analyzed_text_length": 9, "truncated": false, "key_findings": []}, "created_at": "2025-03-10T16:50:16.819174"}
