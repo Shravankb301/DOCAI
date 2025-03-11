@@ -1,15 +1,21 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks, Body
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, BackgroundTasks, Body, Depends
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 import os
 import uuid
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
 import aiofiles
 from app.models.compliance import analyze_document
 from app.utils.database import store_analysis_result
-from app.utils.file_utils import validate_file, get_file_content
+from app.utils.file_utils import validate_file, get_file_content, detect_file_type
 import json
 import glob
 import re
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -25,23 +31,75 @@ def is_valid_uuid(uuid_string: str) -> bool:
     """
     return bool(UUID_PATTERN.match(uuid_string))
 
+# Request model for JSON data
+class TextUploadRequest(BaseModel):
+    text_content: str
+
+# Form data model
+class FormUploadData:
+    def __init__(
+        self,
+        file: Optional[UploadFile] = File(None),
+        text_content: Optional[str] = Form(None)
+    ):
+        self.file = file
+        self.text_content = text_content
+
+# JSON data model
+class JsonUploadData:
+    def __init__(self, data: TextUploadRequest = Body(...)):
+        self.text_content = data.text_content
+        self.file = None
+
+async def get_upload_data(
+    form_data: Optional[FormUploadData] = Depends(FormUploadData),
+    json_data: Optional[TextUploadRequest] = None
+) -> Union[FormUploadData, JsonUploadData]:
+    """
+    Dependency to handle both form data and JSON requests.
+    """
+    if form_data.file is not None or form_data.text_content is not None:
+        return form_data
+    return JsonUploadData(json_data) if json_data else None
+
 @router.post("/upload")
-async def upload_document(
+async def upload_document_form(
     background_tasks: BackgroundTasks,
     file: Optional[UploadFile] = File(None),
     text_content: Optional[str] = Form(None)
 ):
     """
-    Upload a document file or text content for compliance analysis.
+    Upload a document file or text content for compliance analysis using form data.
     """
     if not file and not text_content:
         raise HTTPException(status_code=400, detail="Either file or text content must be provided")
     
+    return await process_upload(background_tasks, file, text_content)
+
+@router.post("/upload/json")
+async def upload_document_json(
+    background_tasks: BackgroundTasks,
+    request: TextUploadRequest
+):
+    """
+    Upload text content for compliance analysis using JSON.
+    """
+    return await process_upload(background_tasks, None, request.text_content)
+
+async def process_upload(
+    background_tasks: BackgroundTasks,
+    file: Optional[UploadFile],
+    text_content: Optional[str]
+) -> JSONResponse:
+    """
+    Process the uploaded document or text content.
+    """
     # Process file upload
     if file:
         # Validate file
-        if not validate_file(file):
-            raise HTTPException(status_code=400, detail="Invalid file type or size")
+        is_valid, error_message = validate_file(file)
+        if not is_valid:
+            raise HTTPException(status_code=400, detail=error_message)
         
         # Generate unique filename
         file_extension = os.path.splitext(file.filename)[1]
@@ -49,23 +107,40 @@ async def upload_document(
         file_path = os.path.join(UPLOAD_DIR, unique_filename)
         
         # Save file
-        async with aiofiles.open(file_path, 'wb') as out_file:
-            content = await file.read()
-            await out_file.write(content)
-        
-        # Read file content for analysis using the appropriate method based on file type
-        content_to_analyze = get_file_content(file_path)
-        
-        # Check if file is empty
-        if not content_to_analyze.strip():
-            raise HTTPException(status_code=400, detail="File is empty or could not be read. Please upload a valid file with content.")
+        try:
+            async with aiofiles.open(file_path, 'wb') as out_file:
+                content = await file.read()
+                await out_file.write(content)
+            
+            logger.info(f"File saved successfully: {file_path}")
+            
+            # Detect file type
+            file_info = detect_file_type(file_path)
+            logger.info(f"File type detected: {file_info}")
+            
+            # Read file content for analysis using the appropriate method based on file type
+            content_to_analyze = get_file_content(file_path)
+            
+            # Check if file content could be extracted
+            if not content_to_analyze or content_to_analyze.startswith("[Error"):
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Could not extract readable content from file: {content_to_analyze}"
+                )
+                
+            # Log file processing success
+            logger.info(f"Successfully extracted content from file: {file.filename} (saved as {unique_filename})")
+            
+        except Exception as e:
+            logger.error(f"Error processing uploaded file: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Error processing uploaded file: {str(e)}")
     else:
         # Use provided text content
         content_to_analyze = text_content
         file_path = None
         
         # Check if text content is empty
-        if not content_to_analyze.strip():
+        if not content_to_analyze or not content_to_analyze.strip():
             raise HTTPException(status_code=400, detail="Text content is empty. Please provide some text to analyze.")
     
     # Generate a document ID
@@ -176,32 +251,31 @@ async def batch_upload(
     files: List[UploadFile] = File(...)
 ):
     """
-    Upload multiple documents for batch compliance analysis.
+    Upload multiple document files for compliance analysis.
     """
-    if not files or len(files) == 0:
+    if not files:
         raise HTTPException(status_code=400, detail="No files provided")
     
-    if len(files) > 10:
-        raise HTTPException(status_code=400, detail="Maximum 10 files allowed per batch")
-    
-    batch_results = []
+    results = []
     
     for file in files:
         # Validate file
-        if not validate_file(file):
-            batch_results.append({
+        is_valid, error_message = validate_file(file)
+        if not is_valid:
+            results.append({
                 "filename": file.filename,
                 "status": "error",
-                "error": "Invalid file type or size"
+                "detail": error_message,
+                "document_id": None
             })
             continue
         
-        # Generate unique filename
-        file_extension = os.path.splitext(file.filename)[1]
-        unique_filename = f"{uuid.uuid4()}{file_extension}"
-        file_path = os.path.join(UPLOAD_DIR, unique_filename)
-        
         try:
+            # Generate unique filename
+            file_extension = os.path.splitext(file.filename)[1]
+            unique_filename = f"{uuid.uuid4()}{file_extension}"
+            file_path = os.path.join(UPLOAD_DIR, unique_filename)
+            
             # Save file
             async with aiofiles.open(file_path, 'wb') as out_file:
                 content = await file.read()
@@ -210,32 +284,38 @@ async def batch_upload(
             # Generate a document ID
             document_id = str(uuid.uuid4())
             
+            # Read file content for analysis
+            content_to_analyze = get_file_content(file_path)
+            
             # Process the document in the background
             background_tasks.add_task(
                 process_document,
-                get_file_content(file_path),
+                content_to_analyze,
                 file_path,
                 document_id
             )
             
-            batch_results.append({
+            results.append({
                 "filename": file.filename,
-                "document_id": document_id,
-                "status": "processing"
+                "status": "processing",
+                "detail": "Document received and being processed",
+                "document_id": document_id
             })
             
         except Exception as e:
-            batch_results.append({
+            logger.error(f"Error processing file {file.filename}: {str(e)}")
+            results.append({
                 "filename": file.filename,
                 "status": "error",
-                "error": str(e)
+                "detail": f"Error processing file: {str(e)}",
+                "document_id": None
             })
     
     return JSONResponse(
         status_code=202,
         content={
-            "message": f"Batch processing started for {len(files)} documents",
-            "results": batch_results
+            "message": f"Processed {len(files)} files",
+            "results": results
         }
     )
 
@@ -244,6 +324,9 @@ async def process_document(content: str, file_path: Optional[str], document_id: 
     Process the document content and store results.
     """
     try:
+        # Log processing start
+        logger.info(f"Starting document processing for document_id: {document_id}")
+        
         # Analyze document for compliance
         analysis_result = analyze_document(content)
         
@@ -255,11 +338,22 @@ async def process_document(content: str, file_path: Optional[str], document_id: 
             details=analysis_result
         )
         
+        logger.info(f"Document processing completed for document_id: {document_id}")
         return document_id
     except Exception as e:
         # Log error
-        print(f"Error processing document: {str(e)}")
-        # Could implement error notification here 
+        logger.error(f"Error processing document {document_id}: {str(e)}")
+        
+        # Store error in database
+        try:
+            await store_analysis_result(
+                id=document_id,
+                file_path=file_path,
+                status="error",
+                details={"error_message": str(e)}
+            )
+        except Exception as db_error:
+            logger.error(f"Error storing analysis result: {str(db_error)}")
 
 @router.delete("/{document_id}")
 async def delete_document(document_id: str):
