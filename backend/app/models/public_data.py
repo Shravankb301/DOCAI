@@ -60,6 +60,63 @@ REGULATORY_SOURCES = [
         "url": "https://www.iso.org/isoiec-27001-information-security.html",
         "description": "Information security management standards.",
         "categories": ["information_security", "risk_management", "security_controls"]
+    },
+    # Adding more regulatory sources
+    {
+        "keyword": "consumer protection",
+        "title": "Consumer Financial Protection Bureau (CFPB) Regulations",
+        "url": "https://www.consumerfinance.gov/rules-policy/",
+        "description": "Regulations to protect consumers in the financial marketplace.",
+        "categories": ["consumer_protection", "financial", "lending"]
+    },
+    {
+        "keyword": "securities",
+        "title": "Securities and Exchange Commission (SEC) Regulations",
+        "url": "https://www.sec.gov/rules",
+        "description": "Regulations governing securities markets and protecting investors.",
+        "categories": ["securities", "investing", "financial_markets"]
+    },
+    {
+        "keyword": "anti-corruption",
+        "title": "Foreign Corrupt Practices Act (FCPA)",
+        "url": "https://www.justice.gov/criminal-fraud/foreign-corrupt-practices-act",
+        "description": "U.S. law prohibiting bribery of foreign officials to obtain business advantages.",
+        "categories": ["anti_corruption", "bribery", "international_business"]
+    },
+    {
+        "keyword": "environmental compliance",
+        "title": "Environmental Protection Agency (EPA) Regulations",
+        "url": "https://www.epa.gov/laws-regulations",
+        "description": "Regulations to protect human health and the environment.",
+        "categories": ["environmental", "pollution", "sustainability"]
+    },
+    {
+        "keyword": "employment",
+        "title": "Equal Employment Opportunity Commission (EEOC) Regulations",
+        "url": "https://www.eeoc.gov/laws-regulations",
+        "description": "Regulations prohibiting workplace discrimination.",
+        "categories": ["employment", "discrimination", "workplace"]
+    },
+    {
+        "keyword": "data breach",
+        "title": "Data Breach Notification Laws",
+        "url": "https://www.ncsl.org/technology-and-communication/security-breach-notification-laws",
+        "description": "State laws requiring notification of security breaches involving personal information.",
+        "categories": ["data_privacy", "security_breach", "notification"]
+    },
+    {
+        "keyword": "export control",
+        "title": "Export Administration Regulations (EAR)",
+        "url": "https://www.bis.doc.gov/index.php/regulations/export-administration-regulations-ear",
+        "description": "Regulations governing exports of commercial and dual-use items.",
+        "categories": ["export_control", "international_trade", "national_security"]
+    },
+    {
+        "keyword": "healthcare compliance",
+        "title": "Centers for Medicare & Medicaid Services (CMS) Regulations",
+        "url": "https://www.cms.gov/regulations-and-guidance/regulations-and-guidance",
+        "description": "Regulations for healthcare providers and facilities.",
+        "categories": ["healthcare", "medicare", "medicaid"]
     }
 ]
 
@@ -110,6 +167,13 @@ def search_regulatory_sources(text: str, threshold: float = 0.3) -> List[Dict[st
         if source["title"].lower() in text_lower:
             relevance_score += 0.4
         
+        # Enhanced matching: Check for related terms
+        related_terms = _get_related_terms(source["keyword"])
+        for term in related_terms:
+            if term.lower() in text_lower:
+                relevance_score += 0.2
+                break
+        
         # Only include sources with relevance above threshold
         if relevance_score >= threshold:
             # Cap the relevance score at 1.0
@@ -127,6 +191,38 @@ def search_regulatory_sources(text: str, threshold: float = 0.3) -> List[Dict[st
     results.sort(key=lambda x: x["relevance_score"], reverse=True)
     
     return results
+
+def _get_related_terms(keyword: str) -> List[str]:
+    """
+    Get related terms for a keyword to enhance search capabilities.
+    
+    Args:
+        keyword: The keyword to find related terms for
+        
+    Returns:
+        List of related terms
+    """
+    # Dictionary of related terms for common regulatory keywords
+    related_terms_dict = {
+        "money laundering": ["aml", "anti-money laundering", "financial crime", "suspicious activity", "kyc", "know your customer"],
+        "lending": ["loan", "credit", "mortgage", "financing", "borrowing", "interest rate"],
+        "data privacy": ["personal data", "data protection", "privacy policy", "data subject", "data controller", "data processor"],
+        "health information": ["phi", "protected health information", "medical records", "patient data", "healthcare data"],
+        "payment processing": ["payment card", "credit card", "debit card", "card processing", "merchant services"],
+        "financial reporting": ["financial statements", "accounting", "audit", "disclosure", "financial records"],
+        "information security": ["infosec", "cybersecurity", "data security", "network security", "security controls"],
+        "consumer protection": ["consumer rights", "unfair practices", "deceptive practices", "consumer complaints"],
+        "securities": ["stocks", "bonds", "investments", "securities trading", "securities fraud"],
+        "anti-corruption": ["bribery", "corruption", "foreign officials", "improper payments"],
+        "environmental compliance": ["environmental regulations", "pollution control", "emissions", "waste management"],
+        "employment": ["labor laws", "workplace", "discrimination", "harassment", "equal opportunity"],
+        "data breach": ["security breach", "data leak", "unauthorized access", "data compromise"],
+        "export control": ["export regulations", "trade compliance", "sanctions", "restricted items"],
+        "healthcare compliance": ["healthcare regulations", "medicare compliance", "medicaid compliance"]
+    }
+    
+    # Return related terms if available, otherwise return empty list
+    return related_terms_dict.get(keyword.lower(), [])
 
 def format_citations(sources: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
