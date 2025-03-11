@@ -8,6 +8,13 @@ from datetime import datetime
 from app.models.public_data import search_regulatory_sources, format_citations
 from app.models.ai_models import analyze_compliance, generate_enhanced_citations
 
+# Try to import the regulatory agents module
+try:
+    from app.models.regulatory_agents import search_with_agents
+    AGENTS_AVAILABLE = True
+except ImportError:
+    AGENTS_AVAILABLE = False
+
 # Check if CUDA is available
 device = 0 if torch.cuda.is_available() else -1
 
@@ -254,7 +261,17 @@ def check_against_public_data(text: str) -> List[Dict[str, Any]]:
     Returns:
         List of public data source matches with relevance scores
     """
-    # Use the new search_regulatory_sources function from public_data module
+    # Try to use the agent-based search if available
+    if AGENTS_AVAILABLE:
+        try:
+            # Use the new agent-based search function
+            agent_results = search_with_agents(text)
+            if agent_results:
+                return agent_results
+        except Exception as e:
+            print(f"Error using agent-based search: {str(e)}")
+    
+    # Fall back to the standard search if agents are not available or failed
     return search_regulatory_sources(text)
 
 def generate_citations(public_data_checks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
