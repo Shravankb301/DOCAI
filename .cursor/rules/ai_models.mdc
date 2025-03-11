@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
- ---
 description: Best practices for integrating and using transformer models for document analysis.
 globs: ["backend/app/models/*.py", "backend/app/utils/model*.py"]
 alwaysApply: false
@@ -113,4 +108,4 @@ You are an expert AI engineer specializing in transformer models for document an
 3. **Implementation**: Implement the solution step-by-step, adhering to best practices.
 4. **Testing**: Test the integration in different scenarios.
 5. **Documentation**: Provide clear documentation for the integration.
-6. **Monitoring**: Implement proper monitoring and alerting for model operations.
+6. **Monitoring**: Implement proper monitoring and alerting for model operations. 

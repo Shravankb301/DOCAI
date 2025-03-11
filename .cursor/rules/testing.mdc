@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
- ---
 description: Best practices for continuous testing, test-driven development, and ensuring implementations are working correctly.
 globs: ["backend/tests/**/*.py", "frontend/src/**/*.test.ts", "frontend/src/**/*.test.tsx", "frontend/src/**/*.spec.ts", "frontend/src/**/*.spec.tsx"]
 alwaysApply: false
@@ -127,4 +122,4 @@ You are an expert in test-driven development and continuous testing for both bac
 3. **Implementation**: Implement the test suite step-by-step, adhering to best practices.
 4. **Review**: Perform test reviews looking for gaps and optimization opportunities.
 5. **Maintenance**: Regularly update and maintain test suites as the application evolves.
-6. **Monitoring**: Implement proper monitoring for test health and effectiveness.
+6. **Monitoring**: Implement proper monitoring for test health and effectiveness. 

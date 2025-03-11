@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
- ---
 description: Best practices for shell scripts and Docker configurations for orchestrating services.
 globs: ["*.sh", "docker-compose.yml", "*/Dockerfile"]
 alwaysApply: false
@@ -87,38 +82,4 @@ You are an expert DevOps engineer specializing in service orchestration, shell s
 3. **Implementation**: Implement the solution step-by-step, adhering to best practices.
 4. **Testing**: Test the orchestration in different scenarios and environments.
 5. **Documentation**: Provide clear documentation for the orchestration process.
-6. **Monitoring**: Implement proper monitoring and alerting for the orchestrated services.
-
-### Backend-Frontend Coordination Best Practices
-- Define and document clear API contracts before implementation begins.
-- Use OpenAPI/Swagger for API documentation and contract validation.
-- Implement feature flags to coordinate gradual rollouts across services.
-- Establish shared data models and validation rules between backend and frontend.
-- Create integration test environments that mirror production.
-- Implement versioned APIs to support backward compatibility.
-- Use mock servers during frontend development to simulate backend responses.
-- Establish communication channels between backend and frontend teams.
-- Synchronize sprint planning and release schedules between teams.
-- Implement end-to-end testing that covers both backend and frontend.
-- Document all API endpoints, request/response formats, and error codes.
-
-### Comprehensive Testing Strategy
-- Implement unit tests for both backend and frontend components.
-- Create integration tests that verify backend-frontend interactions.
-- Develop end-to-end tests that simulate real user scenarios.
-- Implement contract tests to verify API compliance.
-- Test all error conditions and edge cases on both sides.
-- Verify data validation works consistently across backend and frontend.
-- Test performance under various load conditions.
-- Implement security testing (authentication, authorization, input validation).
-- Test for backward compatibility when APIs evolve.
-- Automate regression testing for critical paths.
-- Implement chaos testing to verify system resilience.
-- Test all user roles and permission levels.
-- Verify proper handling of network failures and service unavailability.
-- Test with realistic data volumes and types.
-
-### Coordinated Deployment Process
-- Implement feature branches with integration testing before merging.
-- Use semantic versioning for all services.
-- Create deployment manifests that specify compatible versions.
+6. **Monitoring**: Implement proper monitoring and alerting for the orchestrated services. 
