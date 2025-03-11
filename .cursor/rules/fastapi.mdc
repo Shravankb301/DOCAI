@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
- ---
 description: FastAPI best practices for building robust, efficient, and maintainable APIs.
 globs: ["backend/**/*.py"]
 alwaysApply: false
@@ -91,4 +86,4 @@ You are an expert backend developer specializing in Python, FastAPI, and AI mode
 3. **Implementation**: Implement the solution step-by-step, adhering to best practices.
 4. **Review**: Perform code reviews looking for optimization opportunities.
 5. **Testing**: Ensure comprehensive test coverage.
-6. **Documentation**: Provide clear API documentation and code comments.
+6. **Documentation**: Provide clear API documentation and code comments. 

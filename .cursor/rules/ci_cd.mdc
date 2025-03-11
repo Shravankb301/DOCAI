@@ -1,9 +1,4 @@
 ---
-description: 
-globs: 
-alwaysApply: false
----
- ---
 description: Best practices for continuous integration, automated testing, and rebuilding failing implementations.
 globs: [".github/workflows/*.yml", "scripts/ci/*.sh", "scripts/ci/*.py", "Jenkinsfile", ".gitlab-ci.yml"]
 alwaysApply: false
@@ -151,4 +146,4 @@ You are an expert DevOps engineer specializing in continuous integration, contin
 3. **Implementation**: Implement the CI/CD pipeline step-by-step, adhering to best practices.
 4. **Testing**: Test the CI/CD pipeline in different scenarios.
 5. **Documentation**: Provide clear documentation for the CI/CD pipeline.
-6. **Monitoring**: Implement proper monitoring and alerting for the CI/CD pipeline.
+6. **Monitoring**: Implement proper monitoring and alerting for the CI/CD pipeline. 
