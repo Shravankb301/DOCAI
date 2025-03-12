@@ -18,6 +18,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'history'>('upload');
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [status, setStatus] = useState<string>('');
   
   const addNotification = (message: string, type: 'success' | 'error' | 'info') => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -142,6 +143,16 @@ export default function Home() {
     }
   };
   
+  const testConnection = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/`);
+      const data = await response.json();
+      setStatus(`Connected successfully: ${data.message}`);
+    } catch (error: any) {
+      setStatus(`Connection failed: ${error?.message || 'Unknown error'}`);
+    }
+  };
+  
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-6 md:p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
@@ -197,6 +208,20 @@ export default function Home() {
           onClose={() => removeNotification(notification.id)}
         />
       ))}
+      
+      <div className="mt-4">
+        <button
+          onClick={testConnection}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Test API Connection
+        </button>
+        {status && (
+          <p className={`mt-2 ${status.includes('failed') ? 'text-red-500' : 'text-green-500'}`}>
+            {status}
+          </p>
+        )}
+      </div>
     </main>
   );
 }
