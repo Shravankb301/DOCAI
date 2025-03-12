@@ -63,3 +63,4 @@ local_db/
 uploads/ 
 backend/.env
 backend/.env
+.vercel
