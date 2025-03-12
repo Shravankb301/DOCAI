@@ -9,7 +9,11 @@ const nextConfig = {
   // Add environment variable for API URL
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL
-  }
+  },
+  // Disable source maps in production to reduce bundle size
+  productionBrowserSourceMaps: false,
+  // Ensure output is optimized for Vercel
+  output: 'standalone'
 };
 
 module.exports = nextConfig; 

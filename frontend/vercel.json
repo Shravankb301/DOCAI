@@ -8,5 +8,8 @@
   ],
   "env": {
     "NEXT_PUBLIC_API_URL": "@next_public_api_url"
-  }
+  },
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install"
 } 
