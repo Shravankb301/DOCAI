@@ -15,9 +15,11 @@ export const Notification: React.FC<NotificationProps> = ({
   onClose,
   duration = 5000,
 }) => {
+  const [mounted, setMounted] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   
   useEffect(() => {
+    setMounted(true);
     const timer = setTimeout(() => {
       setIsVisible(false);
       setTimeout(onClose, 300); // Allow time for fade-out animation
@@ -25,6 +27,11 @@ export const Notification: React.FC<NotificationProps> = ({
     
     return () => clearTimeout(timer);
   }, [duration, onClose]);
+  
+  // Don't render anything until after hydration
+  if (!mounted) {
+    return null;
+  }
   
   const getTypeStyles = () => {
     switch (type) {
