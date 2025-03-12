@@ -51,15 +51,16 @@ Thumbs.db
 
 # Environment variables
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+*/.env
+*/.env.*
+!*/.env.example
+backend/.env
+frontend/.env
 
 # Local database
 local_db/
 
 # Uploads
 uploads/ 
-backend/.env
-backend/.env
