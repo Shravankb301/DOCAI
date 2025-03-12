@@ -36,6 +36,14 @@ app.include_router(documents.router, prefix="/api", tags=["documents"])
 async def root():
     return {"message": "Welcome to the AI Compliance Checker API"}
 
+@app.get("/health")
+async def health_check():
+    return {
+        "status": "healthy",
+        "environment": os.getenv("RAILWAY_ENVIRONMENT", "development"),
+        "version": "1.0.0"
+    }
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", "8000"))
