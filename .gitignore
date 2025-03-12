@@ -61,3 +61,5 @@ local_db/
 
 # Uploads
 uploads/ 
+backend/.env
+backend/.env

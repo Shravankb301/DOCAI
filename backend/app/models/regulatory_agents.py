@@ -10,6 +10,7 @@ import json
 import requests
 from datetime import datetime
 import re
+import openai
 
 # Try to import LangChain dependencies
 try:
@@ -25,6 +26,10 @@ except ImportError:
     # Define placeholder types for type hints when LangChain is not available
     class AgentExecutor:
         pass
+
+# Ensure OpenAI API key is set
+if not openai.api_key:
+    openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # Regulatory data sources APIs
 REGULATORY_APIS = {
@@ -49,6 +54,10 @@ class RegulatorySearchAgent:
         self.api_key = api_key
         self.langchain_available = LANGCHAIN_AVAILABLE
         self.agent = self._initialize_agent() if LANGCHAIN_AVAILABLE else None
+        
+        # Ensure OpenAI API key is set
+        if api_key and not openai.api_key:
+            openai.api_key = api_key
     
     def _initialize_agent(self) -> Optional[AgentExecutor]:
         """
@@ -204,6 +213,107 @@ class RegulatorySearchAgent:
         
         return sources
     
+    def _validate_result_with_openai(self, result: Dict[str, Any], query: str) -> Dict[str, Any]:
+        """
+        Validate a single search result using OpenAI's API.
+        
+        Args:
+            result: The search result to validate
+            query: The original search query
+            
+        Returns:
+            Updated result with validation score and feedback
+        """
+        try:
+            # Prepare the prompt for OpenAI
+            prompt = f"""Please analyze this regulatory search result for relevance and accuracy:
+
+Query: {query}
+
+Source: {result['source_name']}
+Description: {result.get('source_description', '')}
+URL: {result['source_url']}
+
+Please provide:
+1. A relevance score (0-1)
+2. Whether this is a legitimate regulatory source (true/false)
+3. Brief explanation of the validation
+
+Respond in JSON format only."""
+
+            # Call OpenAI API using new format
+            response = openai.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a regulatory compliance expert. Validate search results for accuracy and relevance."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3
+            )
+            
+            # Parse the response
+            try:
+                # Get the content from the response
+                content = response.choices[0].message.content
+                print(f"Raw OpenAI response: {content}")
+                
+                # Parse JSON response
+                validation = json.loads(content)
+                print(f"Parsed validation: {validation}")
+                
+                # Convert and validate the values
+                try:
+                    relevance_score = float(validation.get('relevance_score', 0.0))
+                    is_legitimate = bool(validation.get('is_legitimate_source', False))
+                    explanation = str(validation.get('explanation', ''))
+                    
+                    # Ensure score is between 0 and 1
+                    relevance_score = max(0.0, min(1.0, relevance_score))
+                    
+                    print(f"Processed values - Score: {relevance_score}, Legitimate: {is_legitimate}")
+                    
+                    # Update the result with validation data
+                    result['openai_validation'] = {
+                        'relevance_score': relevance_score,
+                        'is_legitimate_source': is_legitimate,
+                        'explanation': explanation
+                    }
+                    
+                    # Adjust the overall relevance score
+                    original_score = float(result.get('relevance_score', 0))
+                    result['relevance_score'] = (original_score + relevance_score) / 2
+                    
+                    print(f"Final validation result: {result['openai_validation']}")
+                    
+                except (ValueError, TypeError) as e:
+                    print(f"Error converting validation values: {str(e)}")
+                    result['openai_validation'] = {
+                        'error': f"Invalid value types in response: {str(e)}",
+                        'status': 'failed',
+                        'relevance_score': 0.0,
+                        'is_legitimate_source': False
+                    }
+                
+            except json.JSONDecodeError as e:
+                print(f"Error parsing OpenAI JSON response: {str(e)}")
+                result['openai_validation'] = {
+                    'error': f"Invalid JSON response: {str(e)}",
+                    'status': 'failed',
+                    'relevance_score': 0.0,
+                    'is_legitimate_source': False
+                }
+            
+        except Exception as e:
+            print(f"Error during OpenAI validation: {str(e)}")
+            result['openai_validation'] = {
+                'error': str(e),
+                'status': 'failed',
+                'relevance_score': 0.0,
+                'is_legitimate_source': False
+            }
+            
+        return result
+
     def search(self, query: str) -> List[Dict[str, Any]]:
         """
         Search for regulatory data using the agent.
@@ -214,13 +324,13 @@ class RegulatorySearchAgent:
         Returns:
             List of regulatory data sources matching the query
         """
+        # Get initial results
         if self.agent:
             try:
                 # Use the agent to search
                 agent_result = self.agent.run(f"Find regulatory compliance information about: {query}")
                 
                 # Parse the agent result to extract structured data
-                # This is a simplified approach; in practice, you'd want more robust parsing
                 sources = self._extract_sources_from_search(agent_result)
                 
                 # Combine with direct search results
@@ -231,15 +341,44 @@ class RegulatorySearchAgent:
                 for source in sources:
                     if not any(result["source_url"] == source["source_url"] for result in all_results):
                         all_results.append(source)
-                
-                return all_results
             except Exception as e:
                 print(f"Error using agent for search: {str(e)}")
                 # Fall back to direct search
-                return self._search_regulatory_data(query)
+                all_results = self._search_regulatory_data(query)
         else:
             # If LangChain is not available, use direct search
-            return self._search_regulatory_data(query)
+            all_results = self._search_regulatory_data(query)
+        
+        print(f"\nValidating {len(all_results)} results...")
+        
+        # Validate results with OpenAI
+        validated_results = []
+        for result in all_results:
+            validated_result = self._validate_result_with_openai(result, query)
+            print(f"\nValidation for {validated_result['source_name']}:")
+            print(f"OpenAI validation: {validated_result.get('openai_validation', {})}")
+            validated_results.append(validated_result)
+        
+        print(f"\nFiltering {len(validated_results)} validated results...")
+        
+        # Filter out results that failed OpenAI validation or have low relevance
+        final_results = []
+        for result in validated_results:
+            validation = result.get('openai_validation', {})
+            is_legitimate = validation.get('is_legitimate_source', False)
+            relevance_score = validation.get('relevance_score', 0.0)
+            
+            print(f"\nChecking result {result['source_name']}:")
+            print(f"Legitimate: {is_legitimate}, Score: {relevance_score}")
+            
+            if is_legitimate and relevance_score >= 0.5:
+                print("Result accepted")
+                final_results.append(result)
+            else:
+                print("Result filtered out")
+        
+        print(f"\nFinal results count: {len(final_results)}")
+        return final_results
 
 def search_with_agents(text: str, threshold: float = 0.3) -> List[Dict[str, Any]]:
     """
