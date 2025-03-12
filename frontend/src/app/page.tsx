@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { UploadForm } from '@/components/UploadForm';
 import { ResultsDisplay } from '@/components/ResultsDisplay';
 import { HistoryDisplay } from '@/components/HistoryDisplay';
@@ -12,9 +12,20 @@ interface Notification {
   type: 'success' | 'error' | 'info';
 }
 
+interface AnalysisResult {
+  status: string;
+  confidence: number;
+  analyzed_text_length: number;
+  all_scores?: {
+    compliant: number;
+    'non-compliant': number;
+  };
+  details?: Record<string, unknown>;
+}
+
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'history'>('upload');
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -68,7 +79,17 @@ export default function Home() {
               
               if (statusData.status === 'completed' && statusData.result) {
                 // We have results, update the UI
-                setResults(statusData.result.details);
+                const result: AnalysisResult = {
+                  status: statusData.result.details.status,
+                  confidence: parseFloat(statusData.result.details.confidence) || 0,
+                  analyzed_text_length: 0,
+                  all_scores: {
+                    compliant: parseFloat(statusData.result.details.all_scores.compliant) || 0,
+                    'non-compliant': parseFloat(statusData.result.details.all_scores['non-compliant']) || 0
+                  },
+                  details: statusData.result.details
+                };
+                setResults(result);
                 setIsLoading(false);
                 addNotification('Analysis complete!', 'success');
                 return;
@@ -82,13 +103,17 @@ export default function Home() {
             } else {
               // On the last attempt, if we still don't have results, show a fallback
               // This is temporary and should be replaced with proper error handling
+              const randomConfidence = Math.random() * 0.5 + 0.5;
+              const randomCompliant = Math.random() * 0.5 + 0.5;
+              const randomNonCompliant = Math.random() * 0.5;
+              
               setResults({
                 status: Math.random() > 0.5 ? 'compliant' : 'non-compliant',
-                confidence: (Math.random() * 0.5 + 0.5).toFixed(2),
+                confidence: randomConfidence,
                 analyzed_text_length: Math.floor(Math.random() * 5000),
                 all_scores: {
-                  'compliant': (Math.random() * 0.5 + 0.5).toFixed(2),
-                  'non-compliant': (Math.random() * 0.5).toFixed(2)
+                  'compliant': randomCompliant,
+                  'non-compliant': randomNonCompliant
                 }
               });
               setIsLoading(false);
@@ -148,8 +173,9 @@ export default function Home() {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/`);
       const data = await response.json();
       setStatus(`Connected successfully: ${data.message}`);
-    } catch (error: any) {
-      setStatus(`Connection failed: ${error?.message || 'Unknown error'}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setStatus(`Connection failed: ${errorMessage}`);
     }
   };
   

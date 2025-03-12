@@ -58,7 +58,7 @@ export const HistoryDisplay: React.FC<HistoryDisplayProps> = ({ onSelectDocument
     try {
       const date = new Date(dateString);
       return date.toLocaleString();
-    } catch (e) {
+    } catch {
       return dateString;
     }
   };
