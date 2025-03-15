@@ -14,13 +14,12 @@ An AI-powered system for checking document compliance using transformer models.
 
 - **Backend**: FastAPI with transformer models
 - **Frontend**: Next.js with Tailwind CSS
-- **Database**: Supabase (PostgreSQL)
+- **Database**: SQLite (local storage)
 
 ## Prerequisites
 
 - Python 3.8+ for backend development
 - Node.js (v14+) for frontend development
-- Supabase account (optional, can use local storage)
 
 ## Setup Instructions
 
@@ -28,14 +27,11 @@ An AI-powered system for checking document compliance using transformer models.
 
 1. Backend:
    - Copy `backend/.env.example` to `backend/.env`
-   - Update with your Supabase credentials (if using Supabase)
 
 2. Frontend:
    - Create `frontend/.env.local` with the following:
      ```
      NEXT_PUBLIC_API_URL=http://localhost:8000
-     NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-     NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
      ```
 
 ### Running the Application
@@ -74,7 +70,7 @@ Once running, you can access:
 
 ## Database Schema
 
-The `risks` table contains:
+The local database contains a table for storing analysis results with the following fields:
 - `id`: Unique identifier
 - `file_path`: Path to the uploaded document
 - `status`: Compliance status
@@ -111,10 +107,9 @@ This project includes Cursor rules to help with development. These rules provide
 1. **FastAPI Best Practices**: Guidelines for backend development with FastAPI.
 2. **Next.js Best Practices**: Guidelines for frontend development with Next.js.
 3. **Orchestration Best Practices**: Guidelines for service orchestration and shell scripting.
-4. **Supabase Integration Best Practices**: Guidelines for integrating Supabase with both backend and frontend.
-5. **AI Model Integration Best Practices**: Guidelines for integrating and using transformer models for document analysis.
-6. **Continuous Testing Best Practices**: Guidelines for continuous testing, test-driven development, and ensuring implementations are working correctly.
-7. **CI/CD Best Practices**: Guidelines for continuous integration and automated testing.
+4. **AI Model Integration Best Practices**: Guidelines for integrating and using transformer models for document analysis.
+5. **Continuous Testing Best Practices**: Guidelines for continuous testing, test-driven development, and ensuring implementations are working correctly.
+6. **CI/CD Best Practices**: Guidelines for continuous integration and automated testing.
 
 For more information about these rules, see the `.cursor/README.md` file.
 
