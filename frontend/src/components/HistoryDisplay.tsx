@@ -15,17 +15,10 @@ interface HistoryDisplayProps {
 
 export const HistoryDisplay: React.FC<HistoryDisplayProps> = ({ onSelectDocument }) => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    
     const fetchHistory = async () => {
       setIsLoading(true);
       setError(null);
@@ -47,18 +40,13 @@ export const HistoryDisplay: React.FC<HistoryDisplayProps> = ({ onSelectDocument
     };
     
     fetchHistory();
-  }, [mounted]);
-  
-  // Don't render loading state during hydration
-  if (!mounted) {
-    return null;
-  }
+  }, []);
   
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
       return date.toLocaleString();
-    } catch {
+    } catch (e) {
       return dateString;
     }
   };

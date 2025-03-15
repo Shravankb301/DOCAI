@@ -14,15 +14,12 @@ An AI-powered system for checking document compliance using transformer models.
 
 - **Backend**: FastAPI with transformer models
 - **Frontend**: Next.js with Tailwind CSS
-- **Database**: Supabase (PostgreSQL)
-- **Containerization**: Docker and Docker Compose
+- **Database**: SQLite (local storage)
 
 ## Prerequisites
 
-- Docker and Docker Compose
-- Node.js (v14+) for local frontend development
-- Python 3.8+ for local backend development
-- Supabase account (optional, can use local storage)
+- Python 3.8+ for backend development
+- Node.js (v14+) for frontend development
 
 ## Setup Instructions
 
@@ -30,46 +27,34 @@ An AI-powered system for checking document compliance using transformer models.
 
 1. Backend:
    - Copy `backend/.env.example` to `backend/.env`
-   - Update with your Supabase credentials (if using Supabase)
 
 2. Frontend:
    - Create `frontend/.env.local` with the following:
      ```
      NEXT_PUBLIC_API_URL=http://localhost:8000
-     NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-     NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
      ```
 
-### Running with Docker
+### Running the Application
+
+The application can be started using the provided `run.sh` script:
 
 ```bash
-# Build and start all services
-docker-compose up -d
+# Make the script executable
+chmod +x run.sh
 
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
+# Run the script
+./run.sh
 ```
 
-### Running Locally
+The script will:
+- Check if required ports (8000 for backend, 3000 for frontend) are available
+- Start the backend service and wait for it to be ready
+- Start the frontend service and wait for it to be ready
+- Provide a clean way to stop both services with Ctrl+C
 
-#### Backend
-
-```bash
-cd backend
-pip install -r requirements.txt
-python run.py
-```
-
-#### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
+Once running, you can access:
+- Backend: http://localhost:8000
+- Frontend: http://localhost:3000
 
 ## Usage
 
@@ -85,7 +70,7 @@ npm run dev
 
 ## Database Schema
 
-The `risks` table contains:
+The local database contains a table for storing analysis results with the following fields:
 - `id`: Unique identifier
 - `file_path`: Path to the uploaded document
 - `status`: Compliance status
@@ -113,85 +98,6 @@ cd frontend
 npm test
 ```
 
-## Orchestration
-
-There are two ways to orchestrate the backend and frontend services:
-
-### Using the run.sh Script
-
-The `run.sh` script provides a convenient way to start both the backend and frontend services with a single command:
-
-```bash
-# Make the script executable
-chmod +x run.sh
-
-# Run the script
-./run.sh
-```
-
-This script:
-- Checks if the required ports (8000 for backend, 3000 for frontend) are available
-- Starts the backend service and waits for it to be ready
-- Starts the frontend service and waits for it to be ready
-- Provides a clean way to stop both services with Ctrl+C
-
-### Using Docker Compose
-
-For a containerized approach, you can use Docker Compose:
-
-```bash
-# Build and start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
-```
-
-The Docker Compose configuration:
-- Builds and runs both services in containers
-- Sets up proper networking between the services
-- Configures health checks to ensure services are running correctly
-- Mounts volumes for persistent data and code changes
-
-### Checking Service Status
-
-You can check the status of the backend and frontend services using the `status.sh` script:
-
-```bash
-# Make the script executable
-chmod +x status.sh
-
-# Run the script
-./status.sh
-```
-
-This script will:
-- Check if the backend is running on port 8000
-- Check if the frontend is running on port 3000
-- Check if Docker containers are running (if Docker is installed)
-- Display the status of each service with color-coded output
-
-### Stopping Services
-
-To stop all running services, you can use the `stop.sh` script:
-
-```bash
-# Make the script executable
-chmod +x stop.sh
-
-# Run the script
-./stop.sh
-```
-
-This script will:
-- Stop any process running on port 8000 (backend)
-- Stop any process running on port 3000 (frontend)
-- Stop Docker containers if Docker Compose is being used
-- Display the status of each operation with color-coded output
-
 ## Development with Cursor
 
 This project includes Cursor rules to help with development. These rules provide guidance and best practices for different aspects of the project.
@@ -200,21 +106,20 @@ This project includes Cursor rules to help with development. These rules provide
 
 1. **FastAPI Best Practices**: Guidelines for backend development with FastAPI.
 2. **Next.js Best Practices**: Guidelines for frontend development with Next.js.
-3. **Orchestration Best Practices**: Guidelines for service orchestration, shell scripting, and containerization.
-4. **Supabase Integration Best Practices**: Guidelines for integrating Supabase with both backend and frontend.
-5. **AI Model Integration Best Practices**: Guidelines for integrating and using transformer models for document analysis.
-6. **Continuous Testing Best Practices**: Guidelines for continuous testing, test-driven development, and ensuring implementations are working correctly.
-7. **CI/CD and Automated Rebuilding Best Practices**: Guidelines for continuous integration, automated testing, and rebuilding failing implementations.
+3. **Orchestration Best Practices**: Guidelines for service orchestration and shell scripting.
+4. **AI Model Integration Best Practices**: Guidelines for integrating and using transformer models for document analysis.
+5. **Continuous Testing Best Practices**: Guidelines for continuous testing, test-driven development, and ensuring implementations are working correctly.
+6. **CI/CD Best Practices**: Guidelines for continuous integration and automated testing.
 
 For more information about these rules, see the `.cursor/README.md` file.
 
-## Continuous Testing and Automated Rebuilding
+## Continuous Testing
 
-This project includes a comprehensive continuous testing and automated rebuilding system to ensure all implementations are working correctly.
+This project includes a comprehensive continuous testing system to ensure all implementations are working correctly.
 
 ### GitHub Actions Workflow
 
-The project includes a GitHub Actions workflow for continuous testing and automated rebuilding:
+The project includes a GitHub Actions workflow for continuous testing:
 
 ```bash
 .github/workflows/continuous-testing.yml
@@ -224,8 +129,7 @@ This workflow:
 - Runs backend tests (unit and integration)
 - Runs frontend tests
 - Runs end-to-end tests
-- Attempts to automatically fix common issues
-- Generates a report of test results and rebuild actions
+- Generates a report of test results
 
 ### Diagnostic and Fix Scripts
 

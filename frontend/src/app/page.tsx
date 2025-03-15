@@ -1,6 +1,6 @@
 'use client';
-// test
-import { useState } from 'react';
+
+import { useState, useRef } from 'react';
 import { UploadForm } from '@/components/UploadForm';
 import { ResultsDisplay } from '@/components/ResultsDisplay';
 import { HistoryDisplay } from '@/components/HistoryDisplay';
@@ -12,24 +12,12 @@ interface Notification {
   type: 'success' | 'error' | 'info';
 }
 
-interface AnalysisResult {
-  status: string;
-  confidence: number;
-  analyzed_text_length: number;
-  all_scores?: {
-    compliant: number;
-    'non-compliant': number;
-  };
-  details?: Record<string, unknown>;
-}
-
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<AnalysisResult | null>(null);
+  const [results, setResults] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'history'>('upload');
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [status, setStatus] = useState<string>('');
   
   const addNotification = (message: string, type: 'success' | 'error' | 'info') => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -79,17 +67,7 @@ export default function Home() {
               
               if (statusData.status === 'completed' && statusData.result) {
                 // We have results, update the UI
-                const result: AnalysisResult = {
-                  status: statusData.result.details.status,
-                  confidence: parseFloat(statusData.result.details.confidence) || 0,
-                  analyzed_text_length: 0,
-                  all_scores: {
-                    compliant: parseFloat(statusData.result.details.all_scores.compliant) || 0,
-                    'non-compliant': parseFloat(statusData.result.details.all_scores['non-compliant']) || 0
-                  },
-                  details: statusData.result.details
-                };
-                setResults(result);
+                setResults(statusData.result.details);
                 setIsLoading(false);
                 addNotification('Analysis complete!', 'success');
                 return;
@@ -103,17 +81,13 @@ export default function Home() {
             } else {
               // On the last attempt, if we still don't have results, show a fallback
               // This is temporary and should be replaced with proper error handling
-              const randomConfidence = Math.random() * 0.5 + 0.5;
-              const randomCompliant = Math.random() * 0.5 + 0.5;
-              const randomNonCompliant = Math.random() * 0.5;
-              
               setResults({
                 status: Math.random() > 0.5 ? 'compliant' : 'non-compliant',
-                confidence: randomConfidence,
+                confidence: (Math.random() * 0.5 + 0.5).toFixed(2),
                 analyzed_text_length: Math.floor(Math.random() * 5000),
                 all_scores: {
-                  'compliant': randomCompliant,
-                  'non-compliant': randomNonCompliant
+                  'compliant': (Math.random() * 0.5 + 0.5).toFixed(2),
+                  'non-compliant': (Math.random() * 0.5).toFixed(2)
                 }
               });
               setIsLoading(false);
@@ -168,22 +142,11 @@ export default function Home() {
     }
   };
   
-  const testConnection = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/`);
-      const data = await response.json();
-      setStatus(`Connected successfully: ${data.message}`);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setStatus(`Connection failed: ${errorMessage}`);
-    }
-  };
-  
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-6 md:p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
         <h1 className="text-4xl font-bold mb-8 text-center">
-          AI Compliance Checker
+          AI Compliance Checker - By Shravan
         </h1>
         
         <div className="flex border-b mb-6">
@@ -234,20 +197,6 @@ export default function Home() {
           onClose={() => removeNotification(notification.id)}
         />
       ))}
-      
-      <div className="mt-4">
-        <button
-          onClick={testConnection}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Test API Connection
-        </button>
-        {status && (
-          <p className={`mt-2 ${status.includes('failed') ? 'text-red-500' : 'text-green-500'}`}>
-            {status}
-          </p>
-        )}
-      </div>
     </main>
   );
 }

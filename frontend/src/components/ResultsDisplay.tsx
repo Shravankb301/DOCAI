@@ -559,7 +559,7 @@ export const ResultsDisplay: React.FC<ResultsDisplayProps> = ({ results, onReset
               <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
                 <p>Citations are generated based on AI analysis of document content against regulatory sources.</p>
                 <p className="mt-1">Higher match percentages indicate stronger relevance to your document.</p>
-                <p className="mt-1">Click on source names, section links, or &quot;Visit Source&quot; buttons to access the original regulatory documents.</p>
+                <p className="mt-1">Click on source names, section links, or "Visit Source" buttons to access the original regulatory documents.</p>
               </div>
             </div>
           )}

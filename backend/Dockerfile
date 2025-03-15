@@ -19,12 +19,8 @@ COPY . .
 # Create upload directory
 RUN mkdir -p uploads local_db
 
-# Set environment variables
-ENV RAILWAY_ENVIRONMENT=production
-ENV PORT=8080
-
-# Expose the port that Railway expects
-EXPOSE ${PORT}
+# Expose port
+EXPOSE 8000
 
 # Run the application
 CMD ["python", "run.py"] 

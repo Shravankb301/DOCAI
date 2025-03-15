@@ -1,0 +1,19 @@
+# Core dependencies
+fastapi>=0.104.1
+uvicorn>=0.27.0
+pydantic>=2.5.0
+python-multipart>=0.0.6
+requests>=2.31.0
+
+# Agent-based search dependencies
+langchain>=0.0.200
+openai>=1.0.0
+duckduckgo-search>=3.8.0
+langchain-openai>=0.0.2
+
+# Additional dependencies
+python-dotenv>=1.0.0
+tenacity>=8.2.0
+backoff>=2.2.0
+tiktoken>=0.5.0
+async-timeout>=4.0.0 
